@@ -1,7 +1,7 @@
 # Assignment 5 for 6.815/865
 # Submission:
-# Deadline:
-# Your name:
+# Deadline: 9/9
+# Your name: Charles Liu
 # Reminder:
 # - Don't hand in data
 # - Don't forget README.txt
@@ -23,6 +23,8 @@ def computeFactor(im1, w1, im2, w2):
 def makeHDR(imageList, epsilonMini=0.002, epsilonMaxi=0.99):
 	out = np.zeros(imageList[0].shape)
 	weightSum = np.zeros(imageList[0].shape)
+	lastW = np.zeros(imageList[0].shape)
+	lastK = 0
 	for i, image in enumerate(imageList):
 		# Compute w, with special cases
 		# Set min or max to beyond [0,1] so it doesn't get clamped
@@ -37,11 +39,13 @@ def makeHDR(imageList, epsilonMini=0.002, epsilonMaxi=0.99):
 		if i == 0:
 			k_i = 1
 		else:
-			k_i = computeFactor(imageList[i-1], lastW, image, w_i) * k_i
+			k_i = computeFactor(imageList[i-1], lastW, image, w_i) * lastK
 		lastW = w_i
+		lastK = k_i
 		weightSum += w_i
 		out += w_i * image / k_i
-	return out / np.sum(weightSum)
+	weightSum[weightSum == 0] = 1e-12
+	return out / weightSum
 
 def toneMap(im, targetBase=100, detailAmp=1, useBila=False):
 	imL, imC = lumiChromi(im)
@@ -60,7 +64,7 @@ def toneMap(im, targetBase=100, detailAmp=1, useBila=False):
 
  	return (10 ** logOut) * imC
 
-def BW(im, weights=[0.4,0.7,0.01]):
+def BW(im, weights=[0.3, 0.6, 0.1]):
     img = im.copy()
     (height, width, rgb) = np.shape(img)
     for y in xrange(height):
@@ -71,6 +75,6 @@ def BW(im, weights=[0.4,0.7,0.01]):
 def lumiChromi(im):
     imcopy = im.copy()
     bw = BW(imcopy)
-    return (bw, imcopy / bw)
-
-
+    bwNonzero = bw.copy()
+    bwNonzero[bw == 0] = 1e-12
+    return (bw, imcopy / bwNonzero)

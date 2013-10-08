@@ -18,31 +18,37 @@ def test_computeFactor():
   if abs(out-50.8426955376)<1 :
     print 'Correct'
 
-def test_makeHDR():
+def test_makeHDR(file):
   import glob
-  inputs=glob.glob('data/ante2-*.png')
+  inputs=sorted(glob.glob('data/' + file + '-*.png'))
   im_list = []
   for inp in inputs:
     im_list.append(io.imread(inp))
 
   hdr=a5.makeHDR(im_list)
-  np.save('hdr', hdr)
+  np.save('npy/'+file+'hdr', hdr)
 
   hdr_scale=hdr/max(hdr.flatten())
-  io.imwrite(hdr_scale, 'hdr_linear_scale.png')
+  io.imwrite(hdr_scale, file+'_hdr_linear_scale.png')
 
-def test_toneMap():
-  hdr=np.load('hdr.npy')
-  out1 = a5.toneMap(hdr, 100, 1, False)
-  io.imwrite(out1, 'tone_map_gauss.png')
-  out2 = a5.toneMap(hdr, 100, 3, True)
-  io.imwrite(out2, 'tone_map_bila.png')
+def test_toneMap(file):
+  hdr=np.load('npy/'+file+'hdr.npy')
+  out1 = a5.toneMap(hdr, 100, 1.0, False)
+  io.imwrite(out1, file+'tone_map_gauss.png')
+  out2 = a5.toneMap(hdr, 100, 1.0, True)
+  io.imwrite(out2, file+'tone_map_bila.png')
 
 
 # Uncomment the below to test your code
 
 # test_computeWeight()
 # test_computeFactor()
-test_makeHDR()
-test_toneMap()
+# images = ['ante1', 'ante2', 'ante3', 'nyc', 'sea']
+# images = ['design', 'horse', 'stairs', 'vine']
+images = ['vine']
+for f in images:
+  print 'Testing', f
+  test_makeHDR(f)
+  test_toneMap(f)
+
 
