@@ -35,7 +35,7 @@ def test_toneMap(file):
   hdr=np.load('npy/'+file+'hdr.npy')
   out1 = a5.toneMap(hdr, 100, 1.0, False)
   io.imwrite(out1, file+'tone_map_gauss.png')
-  out2 = a5.toneMap(hdr, 100, 1.0, True)
+  out2 = a5.toneMap(hdr, 100, 3.0, True)
   io.imwrite(out2, file+'tone_map_bila.png')
 
 
@@ -43,9 +43,8 @@ def test_toneMap(file):
 
 # test_computeWeight()
 # test_computeFactor()
-# images = ['ante1', 'ante2', 'ante3', 'nyc', 'sea']
+images = ['ante1', 'ante2', 'ante3', 'nyc', 'sea']
 # images = ['design', 'horse', 'stairs', 'vine']
-images = ['vine']
 for f in images:
   print 'Testing', f
   test_makeHDR(f)
